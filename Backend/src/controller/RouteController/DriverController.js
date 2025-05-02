@@ -1,10 +1,10 @@
-import DriverModel from "../../Models/driverModel.js";
+import DriverModel from "../../Models/driverProfile.js";
 
 // Register new DriverModel
 const registerDriver = async (req, res) => {
   try {
-    const DriverModel = await DriverModel.create(req.body);
-    res.status(201).json(DriverModel);
+    const driver = await DriverModel.create(req.body);
+    res.status(201).json(driver);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -16,12 +16,12 @@ const updateAvailability = async (req, res) => {
     const { id } = req.params;
     const { isAvailable } = req.body;
 
-    const DriverModel = await DriverModel.findByIdAndUpdate(
+    const driver = await DriverModel.findByIdAndUpdate(
       id,
       { isAvailable },
       { new: true }
     );
-    res.json(DriverModel);
+    res.json(driver);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -33,7 +33,7 @@ const updateLocation = async (req, res) => {
     const { id } = req.params;
     const { lat, lng } = req.body;
 
-    const DriverModel = await DriverModel.findByIdAndUpdate(
+    const driver = await DriverModel.findByIdAndUpdate(
       id,
       {
         location: {
@@ -44,7 +44,7 @@ const updateLocation = async (req, res) => {
       { new: true }
     );
 
-    res.json(DriverModel);
+    res.json(driver);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

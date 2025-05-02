@@ -2,6 +2,7 @@ import UserModel from "../../Models/authmodel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 // Validate environment variables
@@ -9,8 +10,10 @@ if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET is not defined in environment variables");
 }
 
+// Register a new user
 const registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { name, email, phone, password, role = "User" } = req.body;
+
   try {
     // Check if user already exists
     const existingUser = await UserModel.findOne({ email });
@@ -23,17 +26,23 @@ const registerUser = async (req, res) => {
 
     // Create a new user
     const newUser = new UserModel({
-      username,
+      name,
       email,
+      phone,
       password: hashedPassword,
+      role,
     });
 
     const savedUser = await newUser.save();
 
-    // Generate JWT token
-    const token = jwt.sign({ id: savedUser._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRATION || "1h", // Use configurable expiration
-    });
+    // Generate JWT token with role
+    const token = jwt.sign(
+      { id: savedUser._id, role: savedUser.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRATION || "1h",
+      }
+    );
 
     // Return the token to the client
     return res.status(201).json({
@@ -46,8 +55,10 @@ const registerUser = async (req, res) => {
   }
 };
 
+// Authenticate user and return a JWT
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+
   try {
     // Check if user exists
     const user = await UserModel.findOne({ email });
@@ -61,10 +72,14 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRATION || "24h", // Use configurable expiration
-    });
+    // Generate JWT token with role
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRATION || "24h",
+      }
+    );
 
     // Return the token to the client
     res.status(200).json({
