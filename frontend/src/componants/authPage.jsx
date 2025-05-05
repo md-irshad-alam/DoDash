@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import apiClient from "../config/axiosConfig";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -30,20 +31,26 @@ export default function AuthPage() {
       apiClient
         .post("/auth/register", form)
         .then((res) => {
+          toast.success("registration successfull");
           setIsLogin(true);
-          window.alert("registration successfull");
         })
-        .catch((errror) => setIsLogin(false));
+        .catch((error) => {
+          toast.error(error.response.data.msg);
+          setIsLogin(false);
+        });
     }
     if (isLogin) {
-      apiClient.post("/auth/login", form).then((res) => {
-        window.alert("login successful");
-        sessionStorage.setItem("token", res.data.token);
-        navigate("/");
-      });
-      console.log("Login", form);
-    } else {
-      console.log("Signup", form);
+      apiClient
+        .post("/auth/login", form)
+        .then((res) => {
+          toast.success("Login successfull");
+          sessionStorage.setItem("token", res.data.token);
+          navigate("/");
+        })
+        .catch((error) => {
+          console.log(error);
+          toast.error(error.response.data.message);
+        });
     }
   };
 
