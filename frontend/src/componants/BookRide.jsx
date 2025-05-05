@@ -106,15 +106,16 @@ const RideBookingForm = () => {
           BOOK YOUR DESTINATION
         </Typography>
       </div>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="flex justify-between gap-4"
+        className="flex flex-col md:flex-row gap-4"
       >
-        {/* Input Row */}
-        <div className="flex w-[80%] flex-col md:flex-row gap-4">
+        {/* Input Section */}
+        <div className="flex flex-col md:flex-row w-full md:w-[80%] gap-4">
           {/* Origin Input */}
           <div className="relative w-full md:w-1/2">
             <TextField
@@ -141,6 +142,7 @@ const RideBookingForm = () => {
             )}
           </div>
 
+          {/* Destination Input */}
           <div className="relative w-full md:w-1/2">
             <TextField
               label="End Destination"
@@ -167,7 +169,8 @@ const RideBookingForm = () => {
           </div>
         </div>
 
-        <div className="flex w-[20%] flex-row md:flex-row gap-4">
+        {/* Button Section */}
+        <div className="flex flex-col md:flex-row w-full md:w-[20%] gap-4">
           <Button
             type="submit"
             variant="contained"
@@ -194,7 +197,7 @@ const RideBookingForm = () => {
         </div>
       </form>
 
-      {/* Render Booking History */}
+      {/* Booking history */}
       <BookingDetails isfresh={freshloading} />
     </div>
   );
