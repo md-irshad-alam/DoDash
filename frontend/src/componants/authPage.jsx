@@ -31,12 +31,14 @@ export default function AuthPage() {
       apiClient
         .post("/auth/register", form)
         .then((res) => {
+          console.log(res);
           toast.success("registration successfull");
           setIsLogin(true);
         })
         .catch((error) => {
-          toast.error(error.response.data.msg);
-          setIsLogin(false);
+          console.log(error);
+          toast.error(error.response.data.message);
+          setIsLogin(true);
         });
     }
     if (isLogin) {
