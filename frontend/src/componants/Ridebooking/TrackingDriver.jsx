@@ -13,7 +13,7 @@ import { io } from "socket.io-client";
 import { toast } from "react-toastify"; // Assuming you're using react-toastify for error messages
 import apiClient from "../../config/axiosConfig";
 
-const socket = io("http://localhost:4000");
+const socket = io("https://dodash.onrender.com");
 
 // Optional custom icon
 const driverIcon = new L.Icon({
