@@ -103,7 +103,7 @@ function Navbar() {
             component="div"
             sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
           >
-            Photos
+            Do Dash
           </Typography>
 
           <div className="flex items-center justify-between gap-x-4  ">
@@ -112,7 +112,7 @@ function Navbar() {
                 <Typography variant="">Book Ride</Typography>
               </Link>
               <Link to="/profile">
-                <Typography variant="">Edit Profile</Typography>
+                <Typography variant="">Profile</Typography>
               </Link>
             </div>
 
