@@ -45,6 +45,7 @@ const DriverSchema = new mongoose.Schema(
         index: "2dsphere",
       },
     },
+
     rating: {
       type: Number,
       default: 5.0,
@@ -64,6 +65,6 @@ const DriverSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
+DriverSchema.index({ location: "2dsphere" });
 const DriverModel = mongoose.model("Driver", DriverSchema);
 export default DriverModel;

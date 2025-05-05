@@ -2,7 +2,7 @@ import UserModel from "../../Models/authmodel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-
+import DriverModel from "../../Models/driverProfile.js";
 dotenv.config();
 
 // Validate environment variables
@@ -12,7 +12,7 @@ if (!process.env.JWT_SECRET) {
 
 // Register a new user
 const registerUser = async (req, res) => {
-  const { name, email, phone, password, role = "User" } = req.body;
+  const { name, email, password, role = "User" } = req.body;
 
   try {
     // Check if user already exists
@@ -28,7 +28,6 @@ const registerUser = async (req, res) => {
     const newUser = new UserModel({
       name,
       email,
-      phone,
       password: hashedPassword,
       role,
     });
@@ -40,7 +39,7 @@ const registerUser = async (req, res) => {
       { id: savedUser._id, role: savedUser.role },
       process.env.JWT_SECRET,
       {
-        expiresIn: process.env.JWT_EXPIRATION || "1h",
+        expiresIn: process.env.JWT_EXPIRATION || "24h",
       }
     );
 
@@ -91,5 +90,32 @@ const loginUser = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+const userProfile = async (req, res) => {
+  const userId = req.user.id; // Assuming `req.user` is populated by authentication middleware
+  console.log(userId);
+  try {
+    // Fetch user details
+    const user = await UserModel.findById(userId).select("-password"); // Exclude password from the response
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-export default { registerUser, loginUser };
+    // If the user is a driver, fetch driver profile as well
+    let driverProfile = null;
+    if (user.role === "Driver") {
+      driverProfile = await DriverModel.findOne({ user: user._id });
+    }
+
+    // Return user details and driver profile (if applicable)
+    res.status(200).json({
+      message: "User profile fetched successfully",
+      user,
+      driverProfile,
+    });
+  } catch (error) {
+    console.error("Error in userProfile:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export default { registerUser, loginUser, userProfile };
