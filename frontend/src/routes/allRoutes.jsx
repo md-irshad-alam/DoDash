@@ -9,7 +9,7 @@ import DriverForm from "../componants/DriverForm";
 import TrackDriver from "../componants/Ridebooking/TrackingDriver";
 const AllRoutess = () => {
   const token = sessionStorage.getItem("token");
-  console.log(token);
+
   let navigate = useNavigate();
   useEffect(() => {
     if (!token) {

@@ -85,9 +85,9 @@ const BookingDetails = ({ isfresh }) => {
                 Make Payment
               </Button>
             </div>
-            <ProfileItem label="Name" value={item?.driver.user.name} />
+            <ProfileItem label="Name" value={item?.driver?.user?.name} />
             <ProfileItem label="Phone" value={item?.driver?.phone} />
-            <ProfileItem label="Price" value={`${item.fare}. Rupeese`} />
+            <ProfileItem label="Price" value={`${item?.fare}. Rupeese`} />
             <ProfileItem
               label="payment Status"
               value={
@@ -127,7 +127,7 @@ const BookingDetails = ({ isfresh }) => {
                       : "text-red-500"
                   }`}
                 >
-                  {item.status}
+                  {item?.status}
                 </span>
               }
             />
@@ -140,7 +140,7 @@ const BookingDetails = ({ isfresh }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <ProfileItem
                 label="Estimate Time"
-                value={`${item.eta} minutes`}
+                value={`${item?.eta} minutes`}
               />
               <ProfileItem
                 label="Travel Distance"
