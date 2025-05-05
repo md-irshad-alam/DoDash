@@ -1,0 +1,6 @@
+# Prevent committing environment files
+.env
+*.env
+
+# Prevent committing node_modules
+node_modules/

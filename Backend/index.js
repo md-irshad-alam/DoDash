@@ -26,17 +26,6 @@ app.use(express.json());
 app.use("/api/auth", autroutes);
 app.use("/api/driver", driverroutes);
 app.use("/api", bookRoute);
-// controller for the live update(Socket.io )
-
-// io.on("connection", (socket) => {
-//   socket.on("liveLocationUpdate", (data) => {
-//     updateDriverLiveLocation({ ...data, io, socket });
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("Socket disconnected:", socket.id);
-//   });
-// });
 
 io.on("connection", (socket) => {
   socket.on("rideCompleted", async ({ rideId }) => {
