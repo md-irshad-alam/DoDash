@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import apiClient from "../config/axiosConfig";
+import { toast } from "react-toastify";
 
 // Fix marker icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -51,9 +52,9 @@ const DriverForm = () => {
 
     apiClient
       .post("/driver/create", updatedData)
-      .then((res) => window.alert("Driver profile added"))
+      .then((res) => toast.success(res.smg))
       .catch((error) => {
-        window.alert("Failed to add driver");
+        toast.error(error.response.data.error);
         console.log(error);
       });
   };
@@ -102,6 +103,14 @@ const DriverForm = () => {
             ))}
           </TextField>
 
+          <TextField
+            label="Phone Number"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            fullWidth
+            required
+          />
           {/* Vehicle Number */}
           <TextField
             label="Vehicle Number"

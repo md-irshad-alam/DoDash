@@ -17,7 +17,7 @@ const AllRoutess = () => {
     }
   }, [token, navigate]);
   return (
-    <div>
+    <div className="bg-gray-200 h-[100vh] z-0">
       <Navbar />
       <div className="lg:w-[70%] sm:w-full md:w-full m-auto p-4">
         <Routes>
