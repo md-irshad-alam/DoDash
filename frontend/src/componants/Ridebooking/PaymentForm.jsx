@@ -1,105 +1,138 @@
-import React, { useId, useState } from "react";
-import {
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Typography,
-} from "@mui/material";
-import apiClient from "../../config/axiosConfig";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PaymentForm = ({ userId, amount, isOpenModel }) => {
-  const [formdata, setFomrdata] = useState(null);
-  const handleChange = (ev) => {
-    const { name, value } = ev.target;
-    setFomrdata((prev) => ({
+  const [formData, setFormData] = useState({
+    name: "",
+    cardNumber: "",
+    expireDate: "",
+    cvv: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const handlePaymentCnt = () => {
+  const handlePayment = () => {
     if (
-      formdata?.name &&
-      formdata?.cardNumber &&
-      formdata?.expireDate &&
-      formdata?.cvv
+      formData.name &&
+      formData.cardNumber &&
+      formData.expireDate &&
+      formData.cvv
     ) {
-      let payload = {
-        driverId: userId,
-        amount: amount,
-      };
-
-      apiClient
-        .post("driver/user/payment", payload)
-        .then((res) => {
-          toast(res.data.message);
-          isOpenModel(false);
-        })
-        .catch((err) => toast.error(err.response.data.msg));
+      // Simulating API call
+      setTimeout(() => {
+        toast.success("Payment successful!");
+        isOpenModel(false);
+      }, 800);
     } else {
-      toast.warn("Invalid input");
+      toast.warn("Please fill in all fields.");
     }
   };
-  return (
-    <div className="flex justify-center items-center bg-gradient-to-br from-blue-100 to-indigo-200 gap-x-4">
-      <Card className="w-full max-w-md shadow-2xl rounded-2xl">
-        <CardContent className="p-8 space-y-6 ">
-          <form className="space-y-5 flex flex-col gap-4">
-            <TextField
-              name="name"
-              label="Cardholder Name"
-              variant="outlined"
-              fullWidth
-              className="bg-white rounded-md"
-              onChange={handleChange}
-            />
 
-            <TextField
-              name="cardNumber"
-              label="Card Number"
-              variant="outlined"
-              fullWidth
-              className="bg-white rounded-md"
-              inputProps={{ maxLength: 16 }}
-              onChange={handleChange}
-            />
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      {/* <Toaster position="top-right" /> */}
+
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-lg bg-white shadow-2xl rounded-3xl overflow-hidden"
+      >
+        <div className="p-8 space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800">
+              Payment Details
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Enter your card information below
+            </p>
+          </div>
+
+          <div className="space-y-5">
+            <motion.div whileFocus={{ scale: 1.01 }} className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Cardholder Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                placeholder="John Doe"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+              />
+            </motion.div>
+
+            <motion.div whileFocus={{ scale: 1.01 }} className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Card Number
+              </label>
+              <input
+                type="text"
+                name="cardNumber"
+                placeholder="1234 5678 9012 3456"
+                value={formData.cardNumber}
+                onChange={handleChange}
+                maxLength={16}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+              />
+            </motion.div>
 
             <div className="flex gap-4">
-              <TextField
-                name="expireDate"
-                label="Expiry Date"
-                variant="outlined"
-                fullWidth
-                placeholder="MM/YY"
-                className="bg-white rounded-md"
-                onChange={handleChange}
-              />
-              <TextField
-                name="cvv"
-                label="CVV"
-                variant="outlined"
-                fullWidth
-                placeholder="123"
-                className="bg-white rounded-md"
-                inputProps={{ maxLength: 4 }}
-                onChange={handleChange}
-              />
+              <motion.div
+                whileFocus={{ scale: 1.01 }}
+                className="relative flex-1"
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Expiry Date
+                </label>
+                <input
+                  type="text"
+                  name="expireDate"
+                  placeholder="MM/YY"
+                  value={formData.expireDate}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                />
+              </motion.div>
+
+              <motion.div
+                whileFocus={{ scale: 1.01 }}
+                className="relative flex-1"
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  CVV
+                </label>
+                <input
+                  type="text"
+                  name="cvv"
+                  placeholder="123"
+                  value={formData.cvv}
+                  onChange={handleChange}
+                  maxLength={4}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                />
+              </motion.div>
             </div>
 
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              className="mt-4 py-3 rounded-lg shadow-md hover:bg-indigo-600 transition-all"
-              onClick={handlePaymentCnt}
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={handlePayment}
+              className="w-full mt-4 py-3 bg-indigo-600 text-white font-medium rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300"
             >
               Pay Now {amount}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            </motion.button>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

@@ -7,6 +7,7 @@ import RideBookingForm from "../componants/BookRide";
 import AuhtProfile from "../componants/auth/auhtProfile";
 import DriverForm from "../componants/DriverForm";
 import TrackDriver from "../componants/Ridebooking/TrackingDriver";
+import DriverList from "../componants/DriverInfoList";
 const AllRoutess = () => {
   const token = sessionStorage.getItem("token");
 
@@ -17,7 +18,7 @@ const AllRoutess = () => {
     }
   }, [token, navigate]);
   return (
-    <div className="bg-gray-200 h-[100vh] z-0">
+    <div className="bg-black/10">
       <Navbar />
       <div className="lg:w-[70%] sm:w-full md:w-full m-auto p-4">
         <Routes>
@@ -29,6 +30,7 @@ const AllRoutess = () => {
               <Route path="/profile" element={<AuhtProfile />} />
               <Route path="/edit-driver-profile" element={<DriverForm />} />
               <Route path="/track" element={<TrackDriver />} />
+              <Route path="/driver-list" element={<DriverList />} />
             </>
           )}
         </Routes>

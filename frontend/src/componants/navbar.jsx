@@ -6,50 +6,39 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import Switch from "@mui/material/Switch";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Drawer } from "@mui/material";
+import { Button, Divider, Drawer } from "@mui/material";
+import { motion } from "framer-motion";
 
+const navTabItem = [
+  { to: "/book-ride", label: "Book Ride" },
+  { to: "/profile", label: "Profile" },
+  { to: "/driver-list", label: "Drivers" },
+];
 function Navbar() {
-  const [auth, setAuth] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const handleChange = (event) => {
-    setAuth(event.target.checked);
-  };
-
-  const handleMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
   const navigate = useNavigate();
 
-  const handleClickProfile = () => {
-    setAnchorEl(null);
-    navigate("/profile");
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-  let token = sessionStorage.getItem("token");
+  const handleMenu = (event) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
   const handleLogout = () => {
     sessionStorage.clear();
     navigate("/login");
-    window.alert("user logged out");
+    alert("User logged out");
   };
-  React.useEffect(() => {}, [token]);
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-
+  const handleClickProfile = () => {
+    handleClose();
+    navigate("/profile");
+  };
   const toggleDrawer = (open) => (event) => {
     if (
       event.type === "keydown" &&
       (event.key === "Tab" || event.key === "Shift")
-    ) {
+    )
       return;
-    }
     setDrawerOpen(open);
   };
 
@@ -59,62 +48,105 @@ function Navbar() {
       role="presentation"
       onClick={toggleDrawer(false)}
       onKeyDown={toggleDrawer(false)}
+      className="bg-gradient-to-br from-gray-900 to-black text-white h-full"
     >
-      <Typography variant="h6" sx={{ p: 2 }}>
-        Menu
+      <Typography variant="h6" className="p-4 font-bold">
+        Do Dash
       </Typography>
-      <Link
-        to="/book-ride"
-        style={{ textDecoration: "none", color: "inherit" }}
-      >
-        <Typography variant="body1" sx={{ p: 2 }}>
-          Book Ride
-        </Typography>
-      </Link>
-      <Link to="/profile" style={{ textDecoration: "none", color: "inherit" }}>
-        <Typography variant="body1" sx={{ p: 2 }}>
-          Edit Profile
-        </Typography>
-      </Link>
-      <Box className="ml-4">
-        <Button variant="outlined" color="primary">
-          Log out
+      <Divider />
+      {["Book Ride", "Profile", "Drivers"].map((text, index) => (
+        <Link
+          key={index}
+          to={`/${text.toLowerCase().replace(" ", "-")}`}
+          className="block px-4 py-2 text-sm hover:bg-gray-800 transition-colors duration-200"
+        >
+          {text}
+        </Link>
+      ))}
+      <div className="px-4 mt-4">
+        <Button
+          fullWidth
+          variant="outlined"
+          color="error"
+          onClick={handleLogout}
+          className="text-red-400 border-red-500 hover:bg-red-900 hover:text-white"
+        >
+          Logout
         </Button>
-      </Box>
+      </div>
     </Box>
   );
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2, display: { sm: "none" } }}
-            onClick={toggleDrawer(true)}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-          >
-            Do Dash
-          </Typography>
+    <motion.div
+      initial={{ y: -50, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 100 }}
+    >
+      <AppBar
+        position="static"
+        className="bg-gradient-to-r from-black via-gray-900 to-black shadow-lg"
+      >
+        <Toolbar
+          sx={{
+            maxWidth: "1280px",
+            width: "100%",
+            margin: "0 auto",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            px: 2,
+          }}
+        >
+          {/* Left: Hamburger + Logo */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ display: { xs: "inline-flex", sm: "none" } }}
+              onClick={toggleDrawer(true)}
+            >
+              <MenuIcon />
+            </IconButton>
 
-          <div className="flex items-center justify-between gap-x-4  ">
-            <div className="hidden sm:flex items-center gap-x-4">
-              <Link to="/book-ride">
-                <Typography variant="">Book Ride</Typography>
-              </Link>
-              <Link to="/profile">
-                <Typography variant="">Profile</Typography>
-              </Link>
-            </div>
+            <Typography
+              variant="h6"
+              component="div"
+              className="font-bold text-yellow-400"
+            >
+              Ride Sharing
+            </Typography>
+          </Box>
+
+          <Box className="flex justify-between">
+            <Box
+              sx={{
+                display: { xs: "none", sm: "flex" },
+                gap: 4,
+                alignItems: "center",
+                justifyContent: "center",
+                flexGrow: 1,
+              }}
+            >
+              {navTabItem.map((item, index) => (
+                <motion.div
+                  key={index}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link
+                    to={item.to}
+                    className="text-white hover:text-yellow-300 transition-colors duration-200"
+                  >
+                    {item.label}
+                  </Link>
+                </motion.div>
+              ))}
+              <button className="pl-5 pr-5  h-[36px] m-auto border-2 border-blue-300 text-white">
+                logout
+              </button>
+            </Box>
 
             <IconButton
               size="large"
@@ -123,39 +155,19 @@ function Navbar() {
               aria-haspopup="true"
               onClick={handleMenu}
               color="inherit"
+              className="hover:text-yellow-300 transition-colors"
             >
-              <AccountCircle />
+              <AccountCircle fontSize="large" />
             </IconButton>
-
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem onClick={handleClickProfile}>Profile</MenuItem>
-              <MenuItem onClick={handleLogout} className="hover:text-red-400">
-                Logout
-              </MenuItem>
-            </Menu>
-          </div>
+          </Box>
         </Toolbar>
       </AppBar>
-      <React.Fragment>
-        <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
-          {drawerContent}
-        </Drawer>
-      </React.Fragment>
-    </Box>
+
+      {/* Mobile Drawer */}
+      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
+        {drawerContent}
+      </Drawer>
+    </motion.div>
   );
 }
 

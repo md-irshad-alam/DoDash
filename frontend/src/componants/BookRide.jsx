@@ -100,7 +100,7 @@ const RideBookingForm = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 flex flex-col gap-y-10">
       <div className="mb-8 mt-4">
         <Typography className="text-center font-extrabold" variant="h5">
           BOOK YOUR DESTINATION

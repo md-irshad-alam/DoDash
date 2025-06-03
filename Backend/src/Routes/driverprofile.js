@@ -8,7 +8,7 @@ driverroutes.post(
   authMiddleware,
   driverProfileController.registerDriver
 );
-driverroutes.post(
+driverroutes.put(
   "/availability",
   authMiddleware,
   driverProfileController.updateAvailability
@@ -23,5 +23,10 @@ driverroutes.get(
   "/user/get-payment",
   authMiddleware,
   paymentController.getPaymentInfo
+);
+driverroutes.get(
+  "/driver-info",
+  authMiddleware,
+  driverProfileController.GetAllDriverInfoCont
 );
 export default driverroutes;

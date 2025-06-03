@@ -5,10 +5,9 @@ import AllRoutess from "./routes/allRoutes";
 import Parent from "./componants/assign/Parent";
 function App() {
   return (
-    <div>
+    <div className="bg-[#33312a]">
       <ToastContainer />
       <AllRoutess />
-      {/* <Parent /> */}
     </div>
   );
 }

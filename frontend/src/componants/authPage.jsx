@@ -57,7 +57,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4 gap-x-4">
+    <div className="flex items-center justify-center min-h-screen  p-4 gap-x-4">
       <Card className="sm:w-[95%] lg:w-[400px]">
         <Typography variant="h5" className="mb-4 text-center">
           {isLogin ? "Login" : "Sign Up"}

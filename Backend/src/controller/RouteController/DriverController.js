@@ -1,10 +1,11 @@
+import UserModel from "../../Models/authmodel.js";
 import DriverModel from "../../Models/driverProfile.js";
 
 // Register new DriverModel
 const registerDriver = async (req, res) => {
   try {
     const user = req.user.id;
-    console.log(user);
+
     const driver = await DriverModel.create({ ...req.body, user });
     res.status(201).json(driver);
   } catch (err) {
@@ -15,17 +16,38 @@ const registerDriver = async (req, res) => {
 // Update DriverModel availability (toggle online/offline)
 const updateAvailability = async (req, res) => {
   try {
-    const { id } = req.params;
+    const userId = req.user.id;
     const { isAvailable } = req.body;
-
-    const driver = await DriverModel.findByIdAndUpdate(
-      id,
+    console.log(userId);
+    console.log(req.body);
+    const driver = await DriverModel.findOneAndUpdate(
+      { user: userId },
       { isAvailable },
       { new: true }
     );
-    res.json(driver);
+    console.log(driver);
+    res.send({ message: "online status changed", driver });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+const GetAllDriverInfoCont = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const driverInfo = await DriverModel.find().populate({
+      path: "user",
+      select: "name",
+      model: UserModel,
+    });
+    if (!driverInfo || driverInfo.length === 0) {
+      return res.send({ message: "Empty Driver list" });
+    }
+    res.send({ driver: driverInfo });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: "Internal server error !", error });
   }
 };
 
@@ -34,4 +56,5 @@ const updateAvailability = async (req, res) => {
 export default {
   registerDriver,
   updateAvailability,
+  GetAllDriverInfoCont,
 };

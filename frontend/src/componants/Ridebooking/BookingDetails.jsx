@@ -3,28 +3,34 @@ import {
   Typography,
   Divider,
   Button,
-  Drawer,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
+  DialogContentText,
 } from "@mui/material";
 import apiClient from "../../config/axiosConfig";
 import { toast } from "react-toastify";
 import TrackDriver from "./TrackingDriver";
 import PaymentForm from "./PaymentForm";
+import { motion } from "framer-motion";
+
 const BookingDetails = ({ isfresh }) => {
   const [driverProfile, setDriverInfo] = useState([]);
   const [remainingDst, setRemainingDst] = useState(0);
   const [iscancel, setcancel] = useState(false);
   const [isPaymentDone, setPyamentDone] = useState(false);
-  let fetchDta = () => {
+  const [selectedBooking, setSelectedBooking] = useState(null);
+
+  const fetchDta = () => {
     apiClient
       .get("/ride/driver/info")
       .then((res) => setDriverInfo(res.data))
-      .catch((err) => toast.error(err.response.data.msg));
+      .catch((err) =>
+        toast.error(err.response?.data?.msg || "Error fetching data")
+      );
   };
+
   const handleDelete = (id) => {
     apiClient
       .delete(`/ride/cancel/${id}`)
@@ -34,7 +40,7 @@ const BookingDetails = ({ isfresh }) => {
         window.location.reload();
       })
       .catch((error) => {
-        toast.error(error.response.data.msg);
+        toast.error(error.response?.data?.msg || "Failed to cancel ride");
       });
   };
 
@@ -42,156 +48,182 @@ const BookingDetails = ({ isfresh }) => {
     fetchDta();
   }, [isfresh, iscancel]);
 
-  const handleOpen = () => {
+  const openPayment = (booking) => {
+    setSelectedBooking(booking);
     setPyamentDone(true);
   };
+
   const handleClose = () => {
     setPyamentDone(false);
+    setSelectedBooking(null);
   };
 
   return (
-    <div>
-      <div className="mt-8">
-        <div className="mb-4">
-          <Typography variant="h6" className="font-extrabold">
-            Booking Details:
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 md:p-8 text-white"
+    >
+      <div className="max-w-4xl mx-auto mt-10 space-y-10">
+        <div className="text-center">
+          <Typography variant="h4" className="font-bold text-yellow-400">
+            Ride Booking Details
+          </Typography>
+          <Typography variant="subtitle1" className="text-gray-400 mt-2">
+            Track your current ride or make a payment below.
           </Typography>
         </div>
-        <Divider />
+
+        <Divider className="bg-gray-600" />
+
+        {driverProfile.length === 0 ? (
+          <div className="text-center py-10 text-gray-400">
+            No active bookings found.
+          </div>
+        ) : (
+          driverProfile.map((item, indx) => (
+            <motion.div
+              key={indx}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: indx * 0.1 }}
+              className="bg-black/30 backdrop-blur-md border border-gray-700 rounded-2xl p-6 shadow-xl"
+            >
+              <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
+                <Typography variant="h6" className="text-yellow-400 font-bold">
+                  Booking #{item._id.slice(0, 6)}
+                </Typography>
+                <div className="space-x-2">
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => handleDelete(item._id)}
+                    disabled={item.status === "completed"}
+                    className="border-red-500 text-red-400 hover:bg-red-900 hover:text-white"
+                  >
+                    Cancel Ride
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => openPayment(item)}
+                    disabled={item.payment?.paymentStatus === "Completed"}
+                    className="bg-yellow-500 text-black font-semibold hover:bg-yellow-600"
+                  >
+                    {item.payment?.paymentStatus === "Completed"
+                      ? "Paid"
+                      : "Make Payment"}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <ProfileItem label="Name" value={item?.driver?.user?.name} />
+                <ProfileItem label="Phone" value={item?.driver?.phone} />
+                <ProfileItem label="Fare" value={`${item?.fare} Rupees`} />
+                <ProfileItem
+                  label="Payment Status"
+                  value={
+                    <span
+                      className={`font-medium ${
+                        item?.payment?.paymentStatus === "Completed"
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }`}
+                    >
+                      {item?.payment?.paymentStatus || "Pending"}
+                    </span>
+                  }
+                />
+                <ProfileItem
+                  label="Remaining Distance"
+                  value={`${remainingDst.toFixed(2)} km`}
+                />
+                <ProfileItem
+                  label="Ride Status"
+                  value={
+                    <span
+                      className={`font-medium ${
+                        item.status === "completed"
+                          ? "text-green-400"
+                          : "text-yellow-400"
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  }
+                />
+                <ProfileItem
+                  label="Vehicle Type"
+                  value={item?.driver?.vehicleType}
+                />
+                <ProfileItem
+                  label="Vehicle Number"
+                  value={item?.driver?.vehicleNumber}
+                />
+                <ProfileItem
+                  label="Estimated Time"
+                  value={`${item?.eta} minutes`}
+                />
+                <ProfileItem
+                  label="Total Distance"
+                  value={`${item?.distance?.toFixed(2)} km`}
+                />
+                <ProfileItem
+                  label="Rating"
+                  value={renderStars(item?.driver?.rating)}
+                />
+              </div>
+
+              <div className="mt-6">
+                <TrackDriver
+                  driverData={item}
+                  setDriverInfo={setDriverInfo}
+                  remaingDst={setRemainingDst}
+                />
+              </div>
+            </motion.div>
+          ))
+        )}
       </div>
-      {driverProfile?.map((item, indx) => (
-        <div
-          key={indx}
-          className="bg-white shadow-md rounded-xl p-6 border border-gray-200 mt-4"
-        >
-          <div className="space-y-3">
-            <div>
-              <Button
-                variant="outlined"
-                color="secondary"
-                className=" float-end"
-                // disabled={item.status === "completed"}
-                onClick={() => handleDelete(item._id)}
-              >
-                Cancel Ride
-              </Button>
-              <Button
-                variant="outlined"
-                color="secondary"
-                className=" float-end"
-                // disabled={item.status === "completed"}
-                onClick={handleOpen}
-              >
-                Make Payment
-              </Button>
-            </div>
-            <ProfileItem label="Name" value={item?.driver?.user?.name} />
-            <ProfileItem label="Phone" value={item?.driver?.phone} />
-            <ProfileItem label="Price" value={`${item?.fare}. Rupeese`} />
-            <ProfileItem
-              label="payment Status"
-              value={
-                <span
-                  className={`${
-                    item?.payment?.paymentStatus === "Completed"
-                      ? "text-blue-500 font-bold"
-                      : "text-red-500 font-bold"
-                  }`}
-                >
-                  {item?.payment?.paymentStatus || "N / A"}
-                </span>
-              }
-            />
 
-            <ProfileItem
-              label="Remaining Distance "
-              value={
-                <span
-                  className={`${
-                    Math.floor(remainingDst.toFixed(2)) == 0
-                      ? "text-green-500 font-bold"
-                      : "font-bold"
-                  }`}
-                >
-                  {remainingDst.toFixed(2)}Km
-                </span>
-              }
-            />
-            <ProfileItem
-              label="Status"
-              value={
-                <span
-                  className={`font-bold ${
-                    item.status === "completed"
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`}
-                >
-                  {item?.status}
-                </span>
-              }
-            />
-          </div>
-
-          <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-4 text-gray-700">
-              Additional Information:
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <ProfileItem
-                label="Estimate Time"
-                value={`${item?.eta} minutes`}
-              />
-              <ProfileItem
-                label="Travel Distance"
-                value={`${item?.distance?.toFixed(2)} km`}
-              />
-
-              <ProfileItem
-                label="Vehicle Type"
-                value={item?.driver?.vehicleType}
-              />
-              <ProfileItem
-                label="Vehicle Number"
-                value={item?.driver?.vehicleNumber}
-              />
-
-              <ProfileItem
-                label="Rating"
-                value={renderStars(item?.driver?.rating)}
-              />
-            </div>
-          </div>
-          <TrackDriver
-            driverData={item}
-            setDriverInfo={setDriverInfo}
-            remaingDst={setRemainingDst}
-          />
-          <Dialog open={isPaymentDone} onClose={handleClose}>
-            <DialogTitle id="alert-dialog-title">
-              <Typography
-                variant="h5"
-                className="text-center font-bold text-gray-800"
-              >
-                Payment Details
-              </Typography>
-            </DialogTitle>
+      {/* Single Payment Modal */}
+      <Dialog open={isPaymentDone} onClose={handleClose}>
+        <DialogTitle>
+          <Typography
+            variant="h5"
+            className="text-center font-bold text-gray-800"
+          >
+            Payment Details
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText className="mb-4 text-center text-gray-600">
+            Please enter your card information to complete the payment.
+          </DialogContentText>
+          {selectedBooking && (
             <PaymentForm
-              userId={item._id}
-              amount={item.fare}
+              userId={selectedBooking?._id}
+              amount={selectedBooking?.fare}
               isOpenModel={setPyamentDone}
             />
-          </Dialog>
-        </div>
-      ))}
-    </div>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="secondary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </motion.div>
   );
 };
 
 const ProfileItem = ({ label, value }) => (
-  <div className="text-sm sm:text-base text-gray-700">
-    <span className="font-medium">{label}:</span>{" "}
-    <span className="ml-1 text-gray-900">{value || "N/A"}</span>
+  <div className="text-sm sm:text-base text-gray-300">
+    <span className="font-medium text-gray-200">{label}:</span>{" "}
+    <span className="ml-1 text-white">{value || "N/A"}</span>
   </div>
 );
 
@@ -203,7 +235,7 @@ const renderStars = (rating = 0) => {
         <span
           key={i}
           className={
-            i < Math.round(rating) ? "text-yellow-500" : "text-gray-300"
+            i < Math.round(rating) ? "text-yellow-400" : "text-gray-600"
           }
         >
           ★
@@ -212,4 +244,5 @@ const renderStars = (rating = 0) => {
     </div>
   );
 };
+
 export default BookingDetails;
