@@ -14,7 +14,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import apiClient from "../../config/axiosConfig";
 
-const socket = io("https://dodash.onrender.com");
+const socket = io("http://localhost:8080");
 
 // Custom driver icon
 const driverIcon = new L.Icon({
@@ -38,7 +38,12 @@ function getDistance([lng1, lat1], [lng2, lat2]) {
   return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); // in km
 }
 
-const LiveTrackingMap = ({ driverData, setDriverInfo, remaingDst }) => {
+const LiveTrackingMap = ({
+  driverData,
+  setDriverInfo,
+  remaingDst,
+  onDelete,
+}) => {
   const { _id, origin, destination, payment } = driverData;
   const [driverLocation, setDriverLocation] = useState(origin.coordinates);
   const [distanceRemaining, setDistanceRemaining] = useState(null);
@@ -82,9 +87,16 @@ const LiveTrackingMap = ({ driverData, setDriverInfo, remaingDst }) => {
         toast.success("Ride completed!");
       })
       .catch((err) => {
-        toast.error(err.response?.data?.msg || "Error fetching driver info");
+        console.warn(err.response?.data?.msg || "Error fetching driver info");
       });
   };
+  useEffect(() => {
+    socket.on("cancelRide");
+    socket.on("rideCanceled", (data) => {
+      toast.info(data.msg || "Ride canceled");
+      fetchDriverInfo();
+    });
+  });
 
   return (
     <>
@@ -94,10 +106,9 @@ const LiveTrackingMap = ({ driverData, setDriverInfo, remaingDst }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="w-full h-screen flex flex-col md:flex-row  overflow-hidden"
+        className="w-full h-1/2 flex flex-row  md:flex-row  overflow-hidden"
       >
-        {/* Map Section */}
-        <div className="w-full md:w-3/4 h-1/2 md:h-full">
+        <div className="w-full block ">
           <MapContainer
             center={[origin.coordinates[1], origin.coordinates[0]]}
             zoom={12}
@@ -106,7 +117,7 @@ const LiveTrackingMap = ({ driverData, setDriverInfo, remaingDst }) => {
           >
             {/* Dark theme map tiles */}
             <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>  contributors'
             />
 
@@ -142,26 +153,17 @@ const LiveTrackingMap = ({ driverData, setDriverInfo, remaingDst }) => {
           </MapContainer>
         </div>
 
-        {/* Info Panel - Glassmorphism Style */}
         <motion.div
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 100 }}
-          className="w-full md:w-1/4 p-6 backdrop-blur-md bg-black/30 border-l border-gold-400 text-white flex flex-col justify-between"
+          className="w-full md:w-[40%] p-6 backdrop-blur-md bg-black/30 border-l border-gold-400 text-white flex flex-col justify-between"
         >
           <div>
             <h2 className="text-xl font-bold mb-6 text-yellow-400 tracking-wide">
               Live Tracking
             </h2>
             <div className="space-y-5">
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-black/40 p-4 rounded-lg border border-yellow-500 shadow-md"
-              >
-                <p className="text-xs text-yellow-200 uppercase">Driver ID</p>
-                <p className="font-semibold text-yellow-300">{_id}</p>
-              </motion.div>
-
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 className="bg-black/40 p-4 rounded-lg border border-green-500 shadow-md"
@@ -198,10 +200,17 @@ const LiveTrackingMap = ({ driverData, setDriverInfo, remaingDst }) => {
 
           <motion.button
             whileTap={{ scale: 0.98 }}
-            onClick={() => socket.emit("cancelRide", { rideId: _id })}
+            onClick={() => socket.emit("ridecancel", { id: _id })}
             className="mt-6 py-3 px-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold rounded-lg shadow-lg hover:shadow-yellow-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
           >
             Cancel Ride
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => socket.emit("cancelRide", { rideId: _id })}
+            className="mt-6 py-3 px-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold rounded-lg shadow-lg hover:shadow-yellow-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
+          >
+            Make payment
           </motion.button>
         </motion.div>
       </motion.div>

@@ -27,7 +27,7 @@ const BookingDetails = ({ isfresh }) => {
       .get("/ride/driver/info")
       .then((res) => setDriverInfo(res.data))
       .catch((err) =>
-        toast.error(err.response?.data?.msg || "Error fetching data")
+        console.log(err.response?.data?.msg || "Error fetching data")
       );
   };
 
@@ -63,7 +63,7 @@ const BookingDetails = ({ isfresh }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 md:p-8 text-white"
+      className="min-h-screen   border-2 border-slat-200 rounded-2xl p-4 md:p-8 text-white"
     >
       <div className="max-w-4xl mx-auto mt-10 space-y-10">
         <div className="text-center">
@@ -181,6 +181,7 @@ const BookingDetails = ({ isfresh }) => {
                   driverData={item}
                   setDriverInfo={setDriverInfo}
                   remaingDst={setRemainingDst}
+                  onDelete={handleDelete}
                 />
               </div>
             </motion.div>

@@ -5,7 +5,7 @@ import AllRoutess from "./routes/allRoutes";
 import Parent from "./componants/assign/Parent";
 function App() {
   return (
-    <div className="bg-[#33312a]">
+    <div className="bg-slate-100 min-h-screen">
       <ToastContainer />
       <AllRoutess />
     </div>
