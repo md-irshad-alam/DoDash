@@ -143,7 +143,10 @@ function Navbar() {
                   </Link>
                 </motion.div>
               ))}
-              <button className="pl-5 pr-5  h-[36px] m-auto border-2 border-blue-300 text-white">
+              <button
+                onClick={handleLogout}
+                className="pl-5 pr-5  h-[36px] m-auto border-2 border-blue-300 text-white"
+              >
                 logout
               </button>
             </Box>

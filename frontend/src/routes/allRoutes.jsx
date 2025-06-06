@@ -20,7 +20,7 @@ const AllRoutess = () => {
   return (
     <div>
       <Navbar />
-      <div className="lg:w-[70%] sm:w-full md:w-full m-auto p-4">
+      <div className="lg:w-[90%] sm:w-full md:w-full m-auto p-4">
         <Routes>
           {token == null ? (
             <Route path="/login" element={<AuthPage />} />

@@ -75,7 +75,7 @@ const AuthProfile = () => {
                 ></span>
                 {/* Status Text */}
                 <span className="font-semibold text-gray-700">
-                  {profileData !== null && profileData?.isAvailable == true
+                  {profileData !== null && driverProfile?.isAvailable === true
                     ? "Online"
                     : "Offline"}
                 </span>
@@ -91,7 +91,9 @@ const AuthProfile = () => {
                       hadnleToggleStatus(driverProfile?.isAvailable)
                     }
                   >
-                    {profileData.isAvailable ? "Go Offline" : "Go Online"}
+                    {profileData !== null && driverProfile?.isAvailable === true
+                      ? "Go Offline"
+                      : "Go Online"}
                   </button>
                 )}
               </>
